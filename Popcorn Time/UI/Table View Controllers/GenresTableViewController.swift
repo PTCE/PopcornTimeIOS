@@ -31,10 +31,15 @@ class GenresTableViewController: UITableViewController, NSDiscardableContent {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath) as! GenresTableViewCell
-        cell.titleLabel?.text = genres[indexPath.row]
-        cell.selectedRow = selectedRow
-        cell.currentRow = indexPath.row
+        let cell = tableView.dequeueReusableCellWithIdentifier("cell", forIndexPath: indexPath)
+        cell.textLabel?.text = genres[indexPath.row]
+        if selectedRow == indexPath.row {
+            cell.accessoryType = .Checkmark
+            cell.textLabel?.textColor = UIColor.appColor()
+        } else {
+            cell.accessoryType = .None
+            cell.textLabel?.textColor = UIColor.whiteColor()
+        }
         return cell
     }
     

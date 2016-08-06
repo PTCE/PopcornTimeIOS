@@ -4,8 +4,8 @@ import UIKit
 import MediaPlayer
 import PopcornTorrent
 import Alamofire
-import SSZipArchive
 import GZIP
+import SRT2VTT
 
 private enum videoDimensions: NSString {
     case FourByThree = "4:3"
@@ -190,10 +190,9 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
     @IBAction func didFinishPlaying() {
         dismissViewControllerAnimated(true, completion: nil)
         mediaplayer.stop()
-        NSUserDefaults.standardUserDefaults().removeObjectForKey("currentSubtitle")
         PTTorrentStreamer.sharedStreamer().cancelStreaming()
         if NSUserDefaults.standardUserDefaults().boolForKey("removeCacheOnPlayerExit") {
-            try! NSFileManager.defaultManager().removeItemAtURL(NSURL(fileURLWithPath: downloadsDirectory))
+            try! NSFileManager.defaultManager().removeItemAtURL(directory)
         }
     }
     
@@ -204,10 +203,8 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
     var currentSubtitle: PCTSubtitle? {
         didSet {
             if let subtitle = currentSubtitle {
-                NSUserDefaults.standardUserDefaults().setObject(subtitle.language, forKey: "currentSubtitle")
                 openSubtitles(NSURL(string: subtitle.link)!)
             } else {
-                NSUserDefaults.standardUserDefaults().removeObjectForKey("currentSubtitle")
                 mediaplayer.openVideoSubTitlesFromFile("") // Remove all subtitles
             }
         }
@@ -215,7 +212,7 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
     
     // MARK: - Private vars
     
-    private var mediaplayer = VLCMediaPlayer()
+    private (set) var mediaplayer = VLCMediaPlayer()
     private var setPosition = false
     private var stateBeforeScrubbing: VLCMediaPlayerState!
     private var shouldSetStateBeforeScrubbing = true
@@ -255,35 +252,9 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
         if filePath.fileURL {
             mediaplayer.openVideoSubTitlesFromFile(filePath.relativePath!)
         } else {
-            var downloadDirectory: NSURL!
-            var zippedFilePath: NSURL!
-            var fileName: String!
-            Alamofire.download(.GET, filePath,
-                destination: { (temporaryURL, response) -> NSURL in
-                    fileName = response.suggestedFilename!
-                    downloadDirectory = self.directory.URLByAppendingPathComponent("Subtitles")
-                    if !NSFileManager.defaultManager().fileExistsAtPath(downloadDirectory.relativePath!) {
-                        try! NSFileManager.defaultManager().createDirectoryAtURL(downloadDirectory, withIntermediateDirectories: true, attributes: nil)
-                    }
-                    zippedFilePath = downloadDirectory.URLByAppendingPathComponent(fileName)
-                    return zippedFilePath
-            }).validate().response { (_, _, _, error) in
-                if let error = error where error.code != 516 // Error 516 throws if file already exists.
-                {
-                    print(error)
-                    return
-                }
-                if String(fileName.characters.split(".").last!) == "gz" {
-                    let filePath = downloadDirectory.relativePath! + "/" + fileName.stringByReplacingOccurrencesOfString(".gz", withString: "")
-                    NSFileManager.defaultManager().createFileAtPath(filePath, contents: NSFileManager.defaultManager().contentsAtPath(zippedFilePath.relativePath!)?.gunzippedData(), attributes: nil)
-                    self.mediaplayer.openVideoSubTitlesFromFile(filePath)
-                } else {
-                    SSZipArchive.unzipFileAtPath(zippedFilePath.relativePath!, toDestination: downloadDirectory.relativePath!, progressHandler: {(_,_,_,_) in}, completionHandler: { (_, _, _) in
-                        let subtitle = try! NSFileManager.defaultManager().contentsOfDirectoryAtURL(downloadDirectory, includingPropertiesForKeys: [NSURLNameKey], options: .SkipsHiddenFiles).filter({$0.pathExtension == "srt"}).first!
-                        self.mediaplayer.openVideoSubTitlesFromFile(subtitle.relativePath!)
-                    })
-                }
-            }
+            downloadSubtitle(filePath.relativePath!, downloadDirectory: self.directory, covertToVTT: false, completion: { (subtitlePath) in
+                self.mediaplayer.openVideoSubTitlesFromFile(subtitlePath.relativePath!)
+            })
         }
     }
     
@@ -298,6 +269,25 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
         
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        if startPosition > 0.0 {
+            let continueWatchingAlert = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+            continueWatchingAlert.addAction(UIAlertAction(title: "Continue Watching", style: .Default, handler:{ action in
+                self.mediaplayer.play()
+                self.mediaplayer.position = self.startPosition
+                self.positionSlider.value = self.startPosition
+            }))
+            continueWatchingAlert.addAction(UIAlertAction(title: "Start from beginning", style: .Default, handler: { action in
+                self.mediaplayer.play()
+            }))
+            self.presentViewController(continueWatchingAlert, animated: true, completion: nil)
+            
+        } else {
+            mediaplayer.play()
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         subtitleSwitcherButton.hidden = subtitles.count == 0
@@ -305,23 +295,6 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
         mediaplayer.delegate = self
         mediaplayer.drawable = movieView
         mediaplayer.media = VLCMedia(URL: url)
-        if startPosition > 0.0 {
-            let continueWatchingAlert = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
-            continueWatchingAlert.addAction(UIAlertAction(title: "Continue Watching", style: .Default, handler:{ action in
-                self.mediaplayer.play()
-                self.mediaplayer.position = self.startPosition
-                self.positionSlider.value = self.startPosition
-                }))
-            continueWatchingAlert.addAction(UIAlertAction(title: "Start from beginning", style: .Default, handler: { action in
-                self.mediaplayer.play()
-                }))
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.1 * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), { // View is actually not pushed onto the hierarchy until function ends so we wait until then.
-                self.presentViewController(continueWatchingAlert, animated: true, completion: nil)
-            })
-            
-        } else {
-            mediaplayer.play()
-        }
         if let nextMedia = nextMedia {
             upNextView.delegate = self
             upNextView.nextEpisodeInfoLabel.text = "Season \(nextMedia.season) Episode \(nextMedia.episode)"
@@ -477,14 +450,15 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
         if segue.identifier == "showSubtitles" {
             let vc = (segue.destinationViewController as! UINavigationController).viewControllers.first! as! SubtitlesTableViewController
             vc.dataSourceArray = subtitles
+            vc.selectedSubtitle = currentSubtitle
             vc.delegate = self
         } else if segue.identifier == "showDevices" {
             let vc = (segue.destinationViewController as! UINavigationController).viewControllers.first! as! StreamToDevicesTableViewController
             let duration: NSTimeInterval = mediaplayer.time.numberValue.doubleValue/1000.0 + fabs(mediaplayer.remainingTime.numberValue.doubleValue/1000.0)
             if let movie = media as? PCTMovie {
-                vc.castMetadata = PCTCastMetaData(movie: movie, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString!)
+                vc.castMetadata = PCTCastMetaData(movie: movie, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString!, mediaAssetsPath: directory)
             } else if let episode = media as? PCTEpisode {
-                vc.castMetadata = PCTCastMetaData(episode: episode, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString!)
+                vc.castMetadata = PCTCastMetaData(episode: episode, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString!, mediaAssetsPath: directory)
             }
             
         }
@@ -534,4 +508,34 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
         return .Default
     }
     
+}
+
+func downloadSubtitle(path: String, downloadDirectory directory: NSURL, covertToVTT: Bool, completion: (subtitlePath: NSURL) -> Void) {
+    var downloadDirectory: NSURL!
+    var zippedFilePath: NSURL!
+    var fileName: String!
+    Alamofire.download(.GET, path,
+        destination: { (temporaryURL, response) -> NSURL in
+            fileName = response.suggestedFilename!
+            downloadDirectory = directory.URLByAppendingPathComponent("Subtitles")
+            if !NSFileManager.defaultManager().fileExistsAtPath(downloadDirectory.relativePath!) {
+                try! NSFileManager.defaultManager().createDirectoryAtURL(downloadDirectory, withIntermediateDirectories: true, attributes: nil)
+            }
+            zippedFilePath = downloadDirectory.URLByAppendingPathComponent(fileName)
+            return zippedFilePath
+    }).validate().response { (_, _, _, error) in
+        if let error = error where error.code != 516 // Error 516 throws if file already exists.
+        {
+            print(error)
+            return
+        }
+        let filePath = downloadDirectory.relativePath! + "/" + fileName.stringByReplacingOccurrencesOfString(".gz", withString: "")
+        NSFileManager.defaultManager().createFileAtPath(filePath, contents: NSFileManager.defaultManager().contentsAtPath(zippedFilePath.relativePath!)?.gunzippedData(), attributes: nil)
+        if covertToVTT {
+            completion(subtitlePath: SRT.sharedConverter().convertFileToVTT(NSURL(fileURLWithPath: filePath)))
+        } else {
+            completion(subtitlePath: NSURL(fileURLWithPath: filePath))
+        }
+        
+    }
 }

@@ -15,6 +15,7 @@ class StreamToDevicesTableViewController: UITableViewController, GCKDeviceScanne
     var onlyShowCastDevices: Bool = false
     var castMetadata: PCTCastMetaData?
     
+    
     override func viewDidLoad() {
         if !onlyShowCastDevices {
             airPlayManager = AirPlayManager()
@@ -135,7 +136,11 @@ class StreamToDevicesTableViewController: UITableViewController, GCKDeviceScanne
         return 44
     }
     
-    func didConnectToDevice() {
-        dismissViewControllerAnimated(true, completion: nil)
+    func didConnectToDevice(deviceIsChromecast chromecast: Bool) {
+        if chromecast && presentingViewController is PCTPlayerViewController {
+            NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: presentCastPlayerNotification, object: nil))
+        } else {
+           dismissViewControllerAnimated(true, completion: nil)
+        }
     }
 }

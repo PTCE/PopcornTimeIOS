@@ -155,16 +155,16 @@ class MovieDetailViewController: DetailItemOverviewViewController, TablePickerVi
             }, readyToPlay: { (videoFileURL, videoFilePath) in
                 loadingViewController.dismissViewControllerAnimated(false, completion: nil)
                 if onChromecast {
-                    let castMetadata = PCTCastMetaData(movie: media, subtitle: media.currentSubtitle, duration: NSTimeInterval(media.runtime * 60), startPosition: NSTimeInterval(currentProgress), url: videoFileURL.relativeString!)
+                    let castPlayerViewController = self.storyboard?.instantiateViewControllerWithIdentifier("CastPlayerViewController") as! CastPlayerViewController
+                    let castMetadata = PCTCastMetaData(movie: media, subtitle: media.currentSubtitle, duration: 0, startPosition: NSTimeInterval(currentProgress), url: videoFileURL.relativeString!, mediaAssetsPath: videoFilePath.URLByDeletingLastPathComponent!)
                     let metadata = GCKMediaMetadata(metadataType: .Movie)
                     metadata.setString(castMetadata.title, forKey: kGCKMetadataKeyTitle)
                     metadata.addImage(GCKImage(URL: castMetadata.imageUrl, width: 480, height: 720))
-                    var mediaTrack: GCKMediaTrack?
-                    if let subtitle = castMetadata.subtitle {
-                        mediaTrack = GCKMediaTrack(identifier: 1, contentIdentifier: subtitle.link, contentType: "text/plain", type: .Text, textSubtype: .Subtitles, name: subtitle.language, languageCode: subtitle.ISO639, customData: nil)
-                    }
-                    let mediaInfo = GCKMediaInformation(contentID: castMetadata.url, streamType: .Buffered, contentType: castMetadata.contentType, metadata: metadata, streamDuration: castMetadata.duration, mediaTracks: mediaTrack != nil ? [mediaTrack!] : nil, textTrackStyle: GCKMediaTextTrackStyle.createDefault(), customData: nil)
+                    let mediaInfo = GCKMediaInformation(contentID: castMetadata.url, streamType: .Buffered, contentType: castMetadata.contentType, metadata: metadata, streamDuration: 0, mediaTracks: nil, textTrackStyle: nil, customData: nil)
                     GCKCastContext.sharedInstance().sessionManager.currentCastSession!.remoteMediaClient.loadMedia(mediaInfo, autoplay: true, playPosition: castMetadata.startPosition)
+                    castPlayerViewController.backgroundImage = self.backgroundImageView.image
+                    castPlayerViewController.title = media.title
+                    self.presentViewController(castPlayerViewController, animated: true, completion: nil)
                 } else {
                     moviePlayer.play(media, fromURL: videoFileURL, progress: currentProgress, directory: videoFilePath.URLByDeletingLastPathComponent!)
                     self.presentViewController(moviePlayer, animated: true, completion: nil)
@@ -176,6 +176,16 @@ class MovieDetailViewController: DetailItemOverviewViewController, TablePickerVi
                 self.presentViewController(alert, animated: true, completion: nil)
                 print("Error is \(error)")
         }
+    }
+    
+    override func presentCastPlayer() {
+        super.presentCastPlayer()
+        let castPlayer = storyboard?.instantiateViewControllerWithIdentifier("CastPlayerViewController") as! CastPlayerViewController
+//        let castMetadata = PCTCastMetaData(movie: currentItem, subtitle: currentItem.currentSubtitle, duration: 0, startPosition: NSTimeInterval(currentProgress), url: videoFileURL.relativeString!, mediaAssetsPath: videoFilePath.URLByDeletingLastPathComponent!)
+//        GoogleCastManager(castMetadata: castMetadata).sessionManager(GCKCastContext.sharedInstance().sessionManager, didStartSession: GCKCastContext.sharedInstance().sessionManager.currentSession!)
+//        castPlayer.backgroundImage = self.backgroundImageView.image
+//        castPlayer.title = currentItem.title
+        presentViewController(castPlayer, animated: true, completion: nil)
     }
     
 	@IBAction func watchTrailorTapped(sender: AnyObject) {

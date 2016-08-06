@@ -67,7 +67,7 @@ public class TablePickerView: UIView, UITableViewDataSource, UITableViewDelegate
 		prepareView()
 	}
 	
-	// MARK: Set source and get selectted items
+	// MARK: Set source and get selected items
 	
 	public func setSourceDictionay(source : [String : String]) {
 		let sortedKeysAndValues = source.sort({ $0.1 < $1.1 })
@@ -155,6 +155,11 @@ public class TablePickerView: UIView, UITableViewDataSource, UITableViewDelegate
 	
 	public func show() {
 		if let superView = superView {
+            if let selectedItem = _selectedItems.first where dataSourceKeys.contains(selectedItem) {
+                tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: dataSourceKeys.indexOf(selectedItem)!, inSection: 0) , atScrollPosition: .Top, animated: true)
+            } else {
+                tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0) , atScrollPosition: .Top, animated: false)
+            }
 			self.hidden = false
 			var newFrame = self.frame
             newFrame.origin.y = superView.frame.height - self.frame.height

@@ -12,7 +12,7 @@ enum TableViewUpdates {
 
 protocol ConnectDevicesProtocol: class {
     func updateTableView(dataSource newDataSource: [AnyObject], updateType: TableViewUpdates, indexPaths: [NSIndexPath]?)
-    func didConnectToDevice()
+    func didConnectToDevice(deviceIsChromecast chromecast: Bool)
 }
 
 class AirPlayManager: NSObject {
@@ -120,7 +120,6 @@ class AirPlayManager: NSObject {
     optional func isPicked() -> Bool
     optional func passwordType() -> Int
     optional func wirelessDisplayRoute() -> MPAVRouteProtocol
-    
 }
 
 @objc protocol MPAudioDeviceControllerProtocol {

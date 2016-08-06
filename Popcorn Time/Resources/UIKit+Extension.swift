@@ -466,6 +466,18 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return coloredImage
     }
+    
+    class func fromColor(color: UIColor?, inRect rect: CGRect = CGRectMake(0, 0, 1, 1)) -> UIImage {
+        var color: UIColor! = color
+        color = color ?? UIColor.appColor()
+        UIGraphicsBeginImageContext(rect.size)
+        let context = UIGraphicsGetCurrentContext()
+        CGContextSetFillColorWithColor(context, color.CGColor)
+        CGContextFillRect(context, rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
 
 }
 
@@ -513,6 +525,30 @@ class PCTBarSlider: OBSlider {
         self.setThumbImage(UIImage(named: "Scrubber Image"), forState: .Normal)
         super.awakeFromNib()
     }
+}
+
+class PCTProgressSlider: UISlider {
+    
+    override func trackRectForBounds(bounds: CGRect) -> CGRect {
+        var customBounds = super.trackRectForBounds(bounds)
+        customBounds.size.height = 3
+        customBounds.origin.y -= 1
+        return customBounds
+    }
+    
+    override func awakeFromNib() {
+        self.setThumbImage(UIImage(named: "Progress Indicator")?.withColor(minimumTrackTintColor), forState: .Normal)
+        setMinimumTrackImage(UIImage.fromColor(minimumTrackTintColor), forState: .Normal)
+        setMaximumTrackImage(UIImage.fromColor(maximumTrackTintColor), forState: .Normal)
+        super.awakeFromNib()
+    }
+    
+    override func thumbRectForBounds(bounds: CGRect, trackRect rect: CGRect, value: Float) -> CGRect {
+        var frame = super.thumbRectForBounds(bounds, trackRect: rect, value: value)
+        frame.origin.y += rect.origin.y
+        return frame
+    }
+    
 }
 
 // MARK: - Magnets
@@ -594,6 +630,16 @@ extension UIViewController {
     func statusBarHeight() -> CGFloat {
         let statusBarSize = UIApplication.sharedApplication().statusBarFrame.size
         return Swift.min(statusBarSize.width, statusBarSize.height)
+    }
+    
+    func dismissUntilAnimated<T: UIViewController>(animated: Bool, viewController: T.Type, completion: ((viewController: T) -> Void)?) {
+        var vc = presentingViewController!
+        while let new = vc.presentingViewController where !(new is T) {
+            vc = new
+        }
+        vc.dismissViewControllerAnimated(animated, completion: {
+            completion?(viewController: vc as! T)
+        })
     }
 }
 

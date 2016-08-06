@@ -3,7 +3,6 @@
 import Foundation
 import GoogleCast
 
-
 class GoogleCastManager: NSObject, GCKDeviceScannerListener, GCKSessionManagerListener {
     
     var dataSourceArray = [GCKDevice]()
@@ -22,6 +21,12 @@ class GoogleCastManager: NSObject, GCKDeviceScannerListener, GCKSessionManagerLi
         GCKCastContext.sharedInstance().sessionManager.addListener(self)
     }
     
+    /// If you chose to initialise with this method, no delegate requests will be recieved.
+    init(castMetadata: PCTCastMetaData) {
+        super.init()
+        self.castMetadata = castMetadata
+    }
+    
     func didSelectRoute(device: GCKDevice, castMetadata: PCTCastMetaData? = nil) {
         self.castMetadata = castMetadata
         if let session = GCKCastContext.sharedInstance().sessionManager.currentSession {
@@ -32,7 +37,7 @@ class GoogleCastManager: NSObject, GCKDeviceScannerListener, GCKSessionManagerLi
         } else {
             GCKCastContext.sharedInstance().sessionManager.startSessionWithDevice(device)
         }
-        delegate?.didConnectToDevice()
+        delegate?.didConnectToDevice(deviceIsChromecast: true)
     }
     
     // MARK: - GCKDeviceScannerListener
@@ -72,23 +77,32 @@ class GoogleCastManager: NSObject, GCKDeviceScannerListener, GCKSessionManagerLi
     
     func sessionManager(sessionManager: GCKSessionManager, didStartSession session: GCKSession) {
         if let castMetadata = castMetadata {
-            let metadata = GCKMediaMetadata(metadataType: .Movie)
-            metadata.setString(castMetadata.title, forKey: kGCKMetadataKeyTitle)
-            metadata.addImage(GCKImage(URL: castMetadata.imageUrl, width: 480, height: 720))
-            var mediaTrack: GCKMediaTrack?
             if let subtitle = castMetadata.subtitle {
-                mediaTrack = GCKMediaTrack(identifier: 1, contentIdentifier: subtitle.link, contentType: "text/vtt", type: .Text, textSubtype: .Subtitles, name: subtitle.language, languageCode: subtitle.ISO639, customData: nil)
+                downloadSubtitle(subtitle.link, downloadDirectory: castMetadata.mediaAssetsPath, covertToVTT: true, completion: { subtitlePath in
+                    let mediaTrack = GCKMediaTrack(identifier: 1, contentIdentifier: subtitlePath.relativePath!, contentType: "text/vtt", type: .Text, textSubtype: .Subtitles, name: subtitle.language, languageCode: subtitle.ISO639, customData: nil)
+                    self.streamToDevice(mediaTrack, sessionManager: sessionManager, castMetadata: castMetadata)
+                })
+            } else {
+                streamToDevice(sessionManager: sessionManager, castMetadata: castMetadata)
             }
-            let mediaInfo = GCKMediaInformation(contentID: castMetadata.url, streamType: .Buffered, contentType: castMetadata.contentType, metadata: metadata, streamDuration: castMetadata.duration, mediaTracks: mediaTrack != nil ? [mediaTrack!] : nil, textTrackStyle: GCKMediaTextTrackStyle.createDefault(), customData: nil)
-            sessionManager.currentCastSession!.remoteMediaClient.loadMedia(mediaInfo, autoplay: true, playPosition: castMetadata.startPosition)
         }
+    }
+    
+    func streamToDevice(mediaTrack: GCKMediaTrack? = nil, sessionManager: GCKSessionManager, castMetadata: PCTCastMetaData) {
+        let metadata = GCKMediaMetadata(metadataType: .Movie)
+        metadata.setString(castMetadata.title, forKey: kGCKMetadataKeyTitle)
+        metadata.addImage(GCKImage(URL: castMetadata.imageUrl, width: 480, height: 720))
+        let mediaInfo = GCKMediaInformation(contentID: castMetadata.url, streamType: .Buffered, contentType: castMetadata.contentType, metadata: metadata, streamDuration: 0, mediaTracks: nil, textTrackStyle: nil, customData: nil)
+        sessionManager.currentCastSession!.remoteMediaClient.loadMedia(mediaInfo, autoplay: true, playPosition: castMetadata.startPosition)
     }
 
     
     deinit {
-        deviceScanner.stopScan()
-        deviceScanner.removeListener(self)
-        GCKCastContext.sharedInstance().sessionManager.removeListener(self)
+        if deviceScanner.scanning {
+            deviceScanner.stopScan()
+            deviceScanner.removeListener(self)
+            GCKCastContext.sharedInstance().sessionManager.removeListener(self)
+        }
         deviceAwaitingConnection = nil
         castMetadata = nil
     }

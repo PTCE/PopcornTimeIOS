@@ -41,8 +41,8 @@ class AnimeCollectionViewController: ItemOverview, UIPopoverPresentationControll
     }
     
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        if object as! UICollectionView == collectionView! && keyPath! == "frame" {
-            collectionView?.performBatchUpdates(nil, completion: nil)
+        if let collectionView = object as? UICollectionView where collectionView == self.collectionView! && keyPath! == "frame" {
+            collectionView.performBatchUpdates(nil, completion: nil)
         }
     }
     

@@ -22,7 +22,7 @@ class TVShowDetailViewController: DetailItemOverviewViewController, UITableViewD
     
     override var minimumHeight: CGFloat {
         get {
-            return 110.0
+            return navigationController!.navigationBar.bounds.size.height + statusBarHeight() + 46.0
         }
     }
     

@@ -8,6 +8,7 @@ import GoogleCast
 let safariLoginNotification = "kCloseSafariViewControllerNotification"
 let errorNotification = "kErrorNotification"
 let traktAuthenticationErrorNotification = "kTraktAuthenticationErrorNotification"
+let presentCastPlayerNotification = "kPresentCastPlayer"
 let animationLength = 0.37
 
 @UIApplicationMain

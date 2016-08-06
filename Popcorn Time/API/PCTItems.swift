@@ -182,6 +182,7 @@ struct PCTCastMetaData {
     let subtitle: PCTSubtitle?
     let startPosition: NSTimeInterval
     let url: String
+    let mediaAssetsPath: NSURL
     
     init(
         title: String,
@@ -190,7 +191,8 @@ struct PCTCastMetaData {
         duration: NSTimeInterval,
         subtitle: PCTSubtitle?,
         startPosition: NSTimeInterval,
-        url: String
+        url: String,
+        mediaAssetsPath: NSURL
         ) {
         self.title = title
         self.imageUrl = imageUrl
@@ -199,6 +201,7 @@ struct PCTCastMetaData {
         self.subtitle = subtitle
         self.startPosition = startPosition
         self.url = url
+        self.mediaAssetsPath = mediaAssetsPath
     }
     
     init(
@@ -206,9 +209,10 @@ struct PCTCastMetaData {
         subtitle: PCTSubtitle?,
         duration: NSTimeInterval,
         startPosition: NSTimeInterval,
-        url: String
+        url: String,
+        mediaAssetsPath: NSURL
         ) {
-        self.init(title: movie.title, imageUrl: NSURL(string: movie.coverImageAsString)!, contentType: "video/mp4", duration: duration, subtitle: subtitle, startPosition: startPosition, url: url)
+        self.init(title: movie.title, imageUrl: NSURL(string: movie.coverImageAsString)!, contentType: "video/mp4", duration: duration, subtitle: subtitle, startPosition: startPosition, url: url, mediaAssetsPath: mediaAssetsPath)
     }
     
     init(
@@ -216,8 +220,9 @@ struct PCTCastMetaData {
         subtitle: PCTSubtitle?,
         duration: NSTimeInterval,
         startPosition: NSTimeInterval,
-        url: String
+        url: String,
+        mediaAssetsPath: NSURL
         ) {
-        self.init(title: episode.title, imageUrl: NSURL(string: episode.show!.coverImageAsString)!, contentType: "video/x-matroska", duration: duration, subtitle: subtitle, startPosition: startPosition, url: url)
+        self.init(title: episode.title, imageUrl: NSURL(string: episode.show!.coverImageAsString)!, contentType: "video/x-matroska", duration: duration, subtitle: subtitle, startPosition: startPosition, url: url, mediaAssetsPath: mediaAssetsPath)
     }
 }

@@ -3,6 +3,7 @@ use_frameworks!
 
 source 'https://github.com/CocoaPods/Specs'
 source 'https://github.com/PopcornTimeTV/Specs'
+source 'https://github.com/aggelos81/CocoaSpecs'
 
 target "Popcorn Time" do
     pod 'Alamofire'
@@ -22,6 +23,6 @@ target "Popcorn Time" do
     pod '1PasswordExtension'
     pod 'PopcornTorrent/iOS'
     pod 'MobileVLCKit-prod'
-    pod 'SSZipArchive'
     pod 'SwiftyTimer'
+    pod 'SRT2VTT'
 end

@@ -7,6 +7,8 @@
 [![Platform](http://img.shields.io/badge/platform-iOS%20%7C%20tvOS-lightgrey.svg?style=flat)](https://github.com/PopcornTimeTV)
 [![Twitter](https://img.shields.io/badge/twitter-@Popcorn%20Time-3299EC.svg?style=flat)](https://twitter.com/popcorntimetv)
 [![Reddit](https://img.shields.io/badge/discussion-reddit-red.svg?style=flat)](https://reddit.com/r/popcorntime)
+[![Slack](https://img.shields.io/badge/questions-slack-yellow.svg?style=flat)](https://popcorntimetv.slack.com/)
+[![Facebook](https://img.shields.io/badge/facebook-Popcorn%20Time-354F88.svg?style=flat)](https://www.facebook.com/PopcornTimeTv)
 [![Freenode](https://img.shields.io/badge/IRC-freenode-orange.svg?style=flat)](http://webchat.freenode.net/?channels=popcorntime)
 [![Build Status](https://travis-ci.org/PopcornTimeTV/PopcornTimeiOS.svg)](https://travis-ci.org/PopcornTimeTV/PopcornTimeiOS)
 [![License](https://img.shields.io/cocoapods/l/AFNetworking.svg)](https://github.com/PopcornTimeTV/PopcornTimeiOS/blob/master/LICENSE.md)
@@ -22,13 +24,13 @@ Want to report a bug, request a feature, contribute or translate Popcorn Time? C
 This project uses  [CocoaPods](http://cocoapods.org/). Build instructions:
 
 ``` bash
-$ git clone https://github.com/PTCE/PopcornTimeiOS.git master
+$ git clone https://github.com/PopcornTimeTV/PopcornTimeiOS.git master
 $ cd PopcornTimeiOS/
 $ pod install
 $ open Popcorn Time.xcworkspace
 ```
 
-No idea what that means? Visit our more comprehensive  [Build Guide](https://github.com/PTCE/PopcornTimeiOS/wiki)
+No idea what that means? Visit our more comprehensive  [Build Guide](https://github.com/PopcornTimeTV/PopcornTimeiOS/wiki)
 
 ## Versioning
 
@@ -66,6 +68,6 @@ Note: some dependencies are external libraries, which might be covered by a diff
 
 ***
 
-If you want to contact us: [hello@popcorntimece.ch](mailto:hello@popcorntimece.ch)
+If you want to contact us: [hello@popcorntime.io](mailto:hello@popcorntime.sh)
 
-Copyright (c) 2014 Popcorn Time CE Foundation - Released under the [GPL V3 license](https://github.com/PTCE/popcorn-iOS/LICENSE.md).
+Copyright (c) 2014 Popcorn Time Foundation - Released under the [GPL V3 license](https://github.com/mourke/popcorn-iOS/LICENSE.md).

@@ -9,9 +9,11 @@ class DetailItemOverviewViewController: UIViewController, UIGestureRecognizerDel
     var lastTranslation: CGFloat = 0.0
     var lastHeaderHeight: CGFloat = 0.0
     var minimumHeight: CGFloat {
-        return 64.0
+        return navigationController!.navigationBar.bounds.size.height + statusBarHeight()
     }
-    let maximumHeight: CGFloat = 430.0
+    var maximumHeight: CGFloat {
+        return view.bounds.height/1.6
+    }
     
     @IBOutlet var headerHeightConstraint: NSLayoutConstraint!
     @IBOutlet var scrollView: PCTScrollView?
@@ -29,7 +31,9 @@ class DetailItemOverviewViewController: UIViewController, UIGestureRecognizerDel
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(updateCastStatus), name: kGCKCastStateDidChangeNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(orientationChanged), name: UIDeviceOrientationDidChangeNotification, object: nil)
         updateCastStatus()
+         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(presentCastPlayer), name: presentCastPlayerNotification, object: nil)
         self.navigationController!.navigationBar.setBackgroundImage(UIImage(), forBarMetrics:.Default)
         self.navigationController!.navigationBar.shadowImage = UIImage()
         self.navigationController!.navigationBar.backgroundColor = UIColor.clearColor()
@@ -42,6 +46,9 @@ class DetailItemOverviewViewController: UIViewController, UIGestureRecognizerDel
             } else {
                 resetToEnd(tableView!, animated: false)
             }
+            for view in self.gradientViews {
+                view.alpha = 1.0
+            }
             let frame = self.tabBarController?.tabBar.frame
             let offsetY = -frame!.size.height
             self.tabBarController?.tabBar.frame = CGRectOffset(frame!, 0, offsetY)
@@ -50,8 +57,8 @@ class DetailItemOverviewViewController: UIViewController, UIGestureRecognizerDel
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self)
         if transitionCoordinator()?.viewControllerForKey(UITransitionContextToViewControllerKey) == self.navigationController?.topViewController {
+            NSNotificationCenter.defaultCenter().removeObserver(self)
             self.navigationController!.navigationBar.setBackgroundImage(nil, forBarMetrics:.Default)
             self.navigationController!.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
         }
@@ -59,7 +66,20 @@ class DetailItemOverviewViewController: UIViewController, UIGestureRecognizerDel
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        headerHeightConstraint.constant = maximumHeight
         (castButton.customView as! CastIconButton).addTarget(self, action: #selector(castButtonTapped), forControlEvents: .TouchUpInside)
+    }
+    
+    func orientationChanged() {
+        var scrollingView: AnyObject
+        if let tableView = tableView {
+            scrollingView = tableView
+        } else {
+            scrollingView = scrollView!
+        }
+        if headerHeightConstraint.constant > maximumHeight || scrollingView.valueForKey("frame")!.CGRectValue().size.height > scrollingView.valueForKey("contentSize")!.CGSizeValue().height + scrollingView.valueForKey("contentInset")!.UIEdgeInsetsValue().bottom {
+            resetToEnd(scrollingView)
+        }
     }
     
     @IBAction func handleGesture(sender: UIPanGestureRecognizer) {
@@ -152,6 +172,10 @@ class DetailItemOverviewViewController: UIViewController, UIGestureRecognizerDel
     
     func updateCastStatus() {
         (castButton.customView as! CastIconButton).status = GCKCastContext.sharedInstance().castState
+    }
+    
+    func presentCastPlayer() {
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     func presentationController(controller: UIPresentationController, viewControllerForAdaptivePresentationStyle style: UIModalPresentationStyle) -> UIViewController? {
