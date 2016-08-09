@@ -2,8 +2,8 @@ platform :ios, '9.0'
 use_frameworks!
 
 source 'https://github.com/CocoaPods/Specs'
-source 'https://github.com/PopcornTimeTV/Specs'
-source 'https://github.com/aggelos81/CocoaSpecs'
+source 'https://github.com/PTCE-TEAM/Specs'
+source 'https://github.com/PTCE-TEAM/CocoaSpecs'
 
 target "Popcorn Time" do
     pod 'Alamofire'
@@ -12,7 +12,7 @@ target "Popcorn Time" do
     pod 'KMPlaceholderTextView'
     pod 'SwiftyJSON'
     pod 'FloatRatingView', git: 'https://github.com/strekfus/FloatRatingView.git'
-    pod 'AlamofireXMLRPC', git: 'https://github.com/PopcornTimeTV/AlamofireXMLRPC.git'
+    pod 'AlamofireXMLRPC', git: 'https://github.com/PTCE-TEAM/AlamofireXMLRPC.git'
     pod 'Reachability'
     pod 'XCDYouTubeKit'
     pod 'JGProgressHUD'
