@@ -28,8 +28,6 @@ target "Popcorn Time" do
 end
 
 post_install do |installer|
-    #    puts 'Copying Acknowledgements into Settings bundle'.yellow
-    #FileUtils.cp_r('Pods/Target Support Files/Pods-LocalSearch3/Pods-LocalSearch3-acknowledgements.plist', 'Settings.bundle/Acknowledgements.plist', :remove_destination => true)
     installer.pods_project.targets.each do |target|
         target.build_configurations.each do |config|
             config.build_settings['ENABLE_BITCODE'] = 'NO'
@@ -38,7 +36,6 @@ post_install do |installer|
             config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
             config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = 'NO_SIGNING/'
             config.build_settings['CODE_SIGN_IDENTITY[sdk=iphoneos*]'] = ''
-            config.build_settings['CODE_SIGN_IDENTITY[sdk=watchos*]'] = ''
         end
     end
 end
