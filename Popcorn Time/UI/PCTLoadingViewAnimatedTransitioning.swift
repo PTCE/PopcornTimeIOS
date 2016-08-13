@@ -28,12 +28,12 @@ class PCTLoadingViewAnimatedTransitioning: NSObject, UIViewControllerAnimatedTra
     
     func animatePresentationWithTransitionContext(transitionContext: UIViewControllerContextTransitioning) {
         guard
-            let presentedControllerView = transitionContext.viewForKey(UITransitionContextToViewKey),
-            let containerView = transitionContext.containerView()
+            let presentedControllerView = transitionContext.viewForKey(UITransitionContextToViewKey)
             else {
                 return
         }
         
+        let containerView = transitionContext.containerView()
         containerView.addSubview(presentedControllerView)
         presentedControllerView.hidden = true
         
@@ -73,11 +73,11 @@ class PCTLoadingViewAnimatedTransitioning: NSObject, UIViewControllerAnimatedTra
     func animateDismissalWithTransitionContext(transitionContext: UIViewControllerContextTransitioning) {
         guard
             let presentedControllerView = transitionContext.viewForKey(UITransitionContextFromViewKey),
-            let presentingControllerView = transitionContext.viewForKey(UITransitionContextToViewKey),
-            let containerView = transitionContext.containerView()
+            let presentingControllerView = transitionContext.viewForKey(UITransitionContextToViewKey)
             else {
                 return
         }
+        let containerView = transitionContext.containerView()
         containerView.addSubview(presentingControllerView)
         presentedControllerView.hidden = true
         sourceController.navigationController?.setNavigationBarHidden(false, animated: true)

@@ -357,13 +357,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7EA9DF251B61A19A00BAC6AF /* Build configuration list for PBXNativeTarget "Popcorn Time" */;
 			buildPhases = (
-				0024328ABAB9F15E60CCA559 /* 📦 Check Pods Manifest.lock */,
+				0024328ABAB9F15E60CCA559 /* [CP] Check Pods Manifest.lock */,
 				7EA9DF001B61A19A00BAC6AF /* Sources */,
 				7EA9DF011B61A19A00BAC6AF /* Frameworks */,
 				7EA9DF021B61A19A00BAC6AF /* Resources */,
 				7EFFD98A1BA4964C0071910B /* Embed Frameworks */,
-				0D7F983D2003320E48C78AD1 /* 📦 Embed Pods Frameworks */,
-				EDC5BA72AC85EF2BF793347C /* 📦 Copy Pods Resources */,
+				0D7F983D2003320E48C78AD1 /* [CP] Embed Pods Frameworks */,
+				EDC5BA72AC85EF2BF793347C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -388,7 +388,8 @@
 				TargetAttributes = {
 					7EA9DF031B61A19A00BAC6AF = {
 						CreatedOnToolsVersion = 6.4;
-						DevelopmentTeam = 9UC9V3Y3K3;
+						DevelopmentTeam = PY6ULSEB84;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -426,14 +427,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0024328ABAB9F15E60CCA559 /* 📦 Check Pods Manifest.lock */ = {
+		0024328ABAB9F15E60CCA559 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -441,14 +442,14 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		0D7F983D2003320E48C78AD1 /* 📦 Embed Pods Frameworks */ = {
+		0D7F983D2003320E48C78AD1 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -456,14 +457,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Popcorn Time/Pods-Popcorn Time-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EDC5BA72AC85EF2BF793347C /* 📦 Copy Pods Resources */ = {
+		EDC5BA72AC85EF2BF793347C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -619,10 +620,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = PY6ULSEB84;
 				INFOPLIST_FILE = "${SRCROOT}/Popcorn Time/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mourke.popcorntime.ios;
 				PRODUCT_NAME = "Popcorn Time";
 				SWIFT_OBJC_BRIDGING_HEADER = "Popcorn Time/Resources/PopcornTime-Bridging-Header.h";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -632,11 +636,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = PY6ULSEB84;
 				INFOPLIST_FILE = "${SRCROOT}/Popcorn Time/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.mourke.popcorntime.ios;
 				PRODUCT_NAME = "Popcorn Time";
 				SWIFT_OBJC_BRIDGING_HEADER = "Popcorn Time/Resources/PopcornTime-Bridging-Header.h";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};

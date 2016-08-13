@@ -240,10 +240,10 @@ func randomString(length length: Int) -> String {
 let downloadsDirectory: String = {
     let cachesPath = NSFileManager.defaultManager().URLsForDirectory(.CachesDirectory, inDomains: .UserDomainMask)[0]
     let downloadsDirectoryPath = cachesPath.URLByAppendingPathComponent("Downloads")
-    if !NSFileManager.defaultManager().fileExistsAtPath(downloadsDirectoryPath.relativePath!) {
-        try! NSFileManager.defaultManager().createDirectoryAtPath(downloadsDirectoryPath.relativePath!, withIntermediateDirectories: true, attributes: nil)
+    if !NSFileManager.defaultManager().fileExistsAtPath(downloadsDirectoryPath!.relativePath!) {
+        try! NSFileManager.defaultManager().createDirectoryAtPath(downloadsDirectoryPath!.relativePath!, withIntermediateDirectories: true, attributes: nil)
     }
-    return downloadsDirectoryPath.relativePath!
+    return downloadsDirectoryPath!.relativePath!
 }()
 
 extension String {
@@ -296,7 +296,7 @@ extension Dictionary where Value : Equatable {
     }
 }
 
-func += <K, V> (inout left: [K:V], right: [K:V]) {
+func += <K, V> ( inout left: [K:V], right: [K:V]) {
     for (k, v) in right {
         left.updateValue(v, forKey: k)
     }
@@ -444,7 +444,7 @@ extension UIImage {
                               rect.size.height * self.scale)
         }
         
-        let imageRef = CGImageCreateWithImageInRect(self.CGImage, rect)
+        let imageRef = CGImageCreateWithImageInRect(self.CGImage!, rect)
         return UIImage(CGImage: imageRef!, scale: self.scale, orientation: self.imageOrientation)
     }
     
@@ -452,31 +452,31 @@ extension UIImage {
         var color: UIColor! = color
         color = color ?? UIColor.appColor()
         UIGraphicsBeginImageContextWithOptions(self.size, false, UIScreen.mainScreen().scale)
-        let context = UIGraphicsGetCurrentContext()
+        let context = UIGraphicsGetCurrentContext()!
         color.setFill()
         CGContextTranslateCTM(context, 0, self.size.height)
         CGContextScaleCTM(context, 1.0, -1.0)
         CGContextSetBlendMode(context, CGBlendMode.ColorBurn)
         let rect = CGRectMake(0, 0, self.size.width, self.size.height)
-        CGContextDrawImage(context, rect, self.CGImage)
+        CGContextDrawImage(context, rect, self.CGImage!)
         CGContextSetBlendMode(context, CGBlendMode.SourceIn)
         CGContextAddRect(context, rect)
         CGContextDrawPath(context, CGPathDrawingMode.Fill)
         let coloredImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return coloredImage
+        return coloredImage!
     }
     
     class func fromColor(color: UIColor?, inRect rect: CGRect = CGRectMake(0, 0, 1, 1)) -> UIImage {
         var color: UIColor! = color
         color = color ?? UIColor.appColor()
         UIGraphicsBeginImageContext(rect.size)
-        let context = UIGraphicsGetCurrentContext()
+        let context = UIGraphicsGetCurrentContext()!
         CGContextSetFillColorWithColor(context, color.CGColor)
         CGContextFillRect(context, rect)
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image
+        return image!
     }
 
 }

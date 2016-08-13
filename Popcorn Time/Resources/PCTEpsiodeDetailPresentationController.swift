@@ -92,12 +92,12 @@ class  PCTEpisodeDetailAnimatedTransitioning: NSObject, UIViewControllerAnimated
     
     func animatePresentationWithTransitionContext(transitionContext: UIViewControllerContextTransitioning) {
         guard
-            let presentedControllerView = transitionContext.viewForKey(UITransitionContextToViewKey),
-            let containerView = transitionContext.containerView()
+            let presentedControllerView = transitionContext.viewForKey(UITransitionContextToViewKey)
             else {
                 return
         }
         
+        let containerView = transitionContext.containerView()
         containerView.addSubview(presentedControllerView)
         
         UIView.animateWithDuration(transitionDuration(transitionContext), delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: .AllowUserInteraction, animations: {
@@ -109,12 +109,11 @@ class  PCTEpisodeDetailAnimatedTransitioning: NSObject, UIViewControllerAnimated
     
     func animateDismissalWithTransitionContext(transitionContext: UIViewControllerContextTransitioning) {
         guard
-            let presentedControllerView = transitionContext.viewForKey(UITransitionContextFromViewKey),
-            let containerView = transitionContext.containerView()
+            let presentedControllerView = transitionContext.viewForKey(UITransitionContextFromViewKey)
             else {
                 return
         }
-        
+        let containerView = transitionContext.containerView()
         UIView.animateWithDuration(transitionDuration(transitionContext), delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.0, options: .AllowUserInteraction, animations: {
             presentedControllerView.center.y += containerView.bounds.size.height
             }, completion: { _ in
