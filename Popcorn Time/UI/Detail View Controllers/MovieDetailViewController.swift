@@ -156,7 +156,7 @@ class MovieDetailViewController: DetailItemOverviewViewController, TablePickerVi
                 loadingViewController.dismissViewControllerAnimated(false, completion: nil)
                 if onChromecast {
                     let castPlayerViewController = self.storyboard?.instantiateViewControllerWithIdentifier("CastPlayerViewController") as! CastPlayerViewController
-                    let castMetadata = PCTCastMetaData(movie: media, subtitle: media.currentSubtitle, duration: 0, startPosition: NSTimeInterval(currentProgress), url: videoFileURL.relativeString!, mediaAssetsPath: videoFilePath.URLByDeletingLastPathComponent!)
+                    let castMetadata = PCTCastMetaData(movie: media, subtitle: media.currentSubtitle, duration: 0, startPosition: NSTimeInterval(currentProgress), url: videoFileURL.relativeString, mediaAssetsPath: videoFilePath.URLByDeletingLastPathComponent!)
                     let metadata = GCKMediaMetadata(metadataType: .Movie)
                     metadata.setString(castMetadata.title, forKey: kGCKMetadataKeyTitle)
                     metadata.addImage(GCKImage(URL: castMetadata.imageUrl, width: 480, height: 720))

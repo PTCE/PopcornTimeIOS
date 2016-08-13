@@ -456,9 +456,9 @@ class PCTPlayerViewController: UIViewController, UIGestureRecognizerDelegate, UI
             let vc = (segue.destinationViewController as! UINavigationController).viewControllers.first! as! StreamToDevicesTableViewController
             let duration: NSTimeInterval = mediaplayer.time.numberValue.doubleValue/1000.0 + fabs(mediaplayer.remainingTime.numberValue.doubleValue/1000.0)
             if let movie = media as? PCTMovie {
-                vc.castMetadata = PCTCastMetaData(movie: movie, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString!, mediaAssetsPath: directory)
+                vc.castMetadata = PCTCastMetaData(movie: movie, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString, mediaAssetsPath: directory)
             } else if let episode = media as? PCTEpisode {
-                vc.castMetadata = PCTCastMetaData(episode: episode, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString!, mediaAssetsPath: directory)
+                vc.castMetadata = PCTCastMetaData(episode: episode, subtitle: currentSubtitle, duration: duration, startPosition: mediaplayer.time.numberValue.doubleValue/1000.0, url: url.relativeString, mediaAssetsPath: directory)
             }
             
         }
